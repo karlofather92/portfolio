@@ -565,12 +565,14 @@ const cap = document.getElementById('reel-cap'), capHead = cap.querySelector('.h
 let capRow = null, capTimer = 0;
 function reelCap(rows, mid){
   const ul = document.getElementById('home-items'), u = ul.getBoundingClientRect();
-  if(!listing.hidden || !rows.length || document.getElementById('home').hidden || u.top > mid || u.bottom < mid){ cap.classList.remove('on'); capRow = null; return; }
+  if(!listing.hidden || !rows.length || document.getElementById('home').hidden || u.top > innerHeight || u.bottom < 0){ cap.classList.remove('on'); capRow = null; return; }
   let best = null, bd = Infinity;
   rows.forEach(li => { const r = li.getBoundingClientRect(), d = Math.abs(r.top + r.height/2 - mid); if(d < bd){ bd = d; best = li; } });
   const h = best.offsetHeight;
   cap.style.left = u.left + 'px'; cap.style.width = u.width + 'px';
-  cap.style.top = (mid - h/2) + 'px'; cap.style.height = h + 'px';
+  // stays in the middle, but rides along with the first and last rows at the ends of the reel
+  const first = rows[0].getBoundingClientRect().top, lastR = rows[rows.length-1].getBoundingClientRect().top;
+  cap.style.top = Math.min(Math.max(mid - h/2, first), lastR) + 'px'; cap.style.height = h + 'px';
   cap.classList.add('on');
   if(best === capRow) return;
   const src = best.querySelector('.head');
