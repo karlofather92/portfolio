@@ -80,6 +80,8 @@ footer{padding-block:32px;border-top:1px solid var(--line);font-size:10px;letter
 .projects li{--fh:calc(clamp(260px,46vh,520px) - 50px)}
 /* every project sits in the same wide frame, like the Time Relay film */
 .projects .frame{align-items:center}
+/* rows away from the middle fade to 30% */
+.projects .frame{opacity:calc(.3 + .7 * var(--t,0) * var(--t,0));transition:opacity .15s linear}
 .projects .frame video,.projects .frame img,.projects .frame .ph{width:min(100%, calc(var(--fh) * 2.3188));height:auto;aspect-ratio:1280/552;object-fit:cover;display:block;background:#000}
 .projects .frame img.pan{animation:pan 14s ease-in-out infinite alternate}
 @keyframes pan{from{object-position:50% 0%}to{object-position:50% 100%}}
