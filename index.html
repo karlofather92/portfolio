@@ -523,7 +523,7 @@ const PROJECTS = {
 };
 const FILTERS = [['all','All'],['art','Installations'],['commercial','Set design'],['objects','Objects'],['fabrication','Fabrication']];
 let filter = 'all';
-const ORDER = ['rele', 'axe', 'b2a', 'frame'];
+const ORDER = ['rele', 'axe', 'b2a', 'frame', 'soundsystem'];
 function renderWorks(){
   const total = Object.values(LISTS).reduce((n, L) => n + L.items.length, 0);
   document.getElementById('filters').innerHTML = FILTERS.map(([k, name]) => {
