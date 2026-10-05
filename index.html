@@ -485,7 +485,7 @@ const LISTS = {
   art: {title:'Installations', intro:'Installations and exhibitions.', items:[['Time Relay','2026','rele','rele'],['Gesamt','2022','gesamt','gesamt'],['Ants','2026','ants','ants'],['Untitled','2026','art1','art1'],['Wardrobe','2026','wardrobe','wardrobe']]},
   commercial: {title:'Set design', intro:'Sets for film, video, shows and events.', items:[['Mujuice, Zodiac','2026','quarry','quarry'],['Lilu, Wings','2026','lilu','lilu'],['ADED x KOSHTA, Facing Evil','2022','aded','aded']]},
   objects: {title:'Objects', intro:'Objects and furniture.', items:[['Axe','2026','axe','axe'],['B2A Awards','2026','b2a','b2a'],['Trident','2022','trident','trident'],['Bread Chair','2026','chair','chair']]},
-  fabrication: {title:'Fabrication', intro:'Making and production of pieces.', items:[['Modular Frame','2026','frame','frame']]}
+  fabrication: {title:'Fabrication', intro:'Making and production of pieces.', items:[['Modular Frame','2026','frame','frame'],['Sound System','2026','soundsystem','soundsystem']]}
 };
 const home = document.getElementById('home'), listing = document.getElementById('listing');
 function esc(t){ return String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -499,6 +499,8 @@ const PROJECTS = {
   b2a: {title:'B2A Awards', year:'2026', sub:'Award statuettes', parent:'objects', images: JSON.parse(document.getElementById('b2a-data').textContent),
     desc: ['Award statuettes for B2A, the Business to Arts awards held as part of the ASA Forum in Armenia.',
            'The statuettes were made for companies recognized for their contribution to cultural development in Armenia: supporting artistic initiatives, preserving cultural heritage, and fostering collaboration between business and the arts.']},
+  soundsystem: {title:'Sound System', year:'2026', sub:'Speaker cabinets', parent:'fabrication', images: [], video: {src:'soundsystem.mp4', poster:'soundsystem-poster.jpg'},
+    desc: ['Sound system built together with Sek.']},
   frame: {title:'Modular Frame', year:'2026', sub:'Metal frame, LED panels', parent:'fabrication', images: [], video: {src:'frame.mp4', poster:'frame-poster.jpg', silent: true},
     desc: ['Modular frame structure for a media installation by Misak (@__misak).',
            'The installation is based on light, volume and LED panels that generate an optical distortion effect within the space.']},
