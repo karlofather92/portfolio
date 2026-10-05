@@ -110,6 +110,8 @@ html.snap #home footer{scroll-snap-align:end}
 .filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:24px}
 @media (max-width:900px){.filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:520px){.filters{display:flex;flex-wrap:wrap;gap:12px 20px}.filters span{display:none}}
+/* wide screens: the heading and the five filters share one grid of six equal columns */
+@media (min-width:901px){.works-bar{grid-template-columns:repeat(6,minmax(0,1fr));column-gap:24px}.filters{display:contents}}
 .filters button{font:inherit;text-transform:inherit;letter-spacing:inherit;text-align:left;background:none;border:0;padding:0;color:var(--muted);cursor:pointer;display:grid;gap:10px;align-content:start}
 .filters b{font-weight:500;font-size:12px;display:flex;gap:6px;align-items:flex-start}
 .filters sup{font-size:9px;font-variant-numeric:tabular-nums;line-height:1}
