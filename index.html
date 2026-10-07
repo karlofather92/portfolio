@@ -1,7 +1,3 @@
-<!doctype html>
-<html lang="en">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Iurii Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -601,8 +597,22 @@ function frameImg(kind, title){
   return `<span class="ph">${PROJECTS[kind] ? esc(PROJECTS[kind].title) : 'image'}</span>`;
 }
 // scale each row by how close it is to the middle of the screen
+// on phones the visible part of the screen can be smaller than the layout viewport (browser bars),
+// so the snap area is padded to match what is actually on screen and the chosen project sits in its middle
+const vpProbe = Object.assign(document.createElement('div'), {ariaHidden: 'true'});
+vpProbe.style.cssText = 'position:fixed;top:0;bottom:0;left:0;width:0;visibility:hidden;pointer-events:none';
+document.body.appendChild(vpProbe);
+function screenMid(){ const vv = window.visualViewport; return vv ? vv.offsetTop + vv.height / 2 : innerHeight / 2; }
+function fitSnap(){
+  const vv = window.visualViewport; if(!vv) return;
+  const lh = vpProbe.offsetHeight, top = Math.max(0, vv.offsetTop), bottom = Math.max(0, lh - vv.offsetTop - vv.height);
+  const st = document.documentElement.style;
+  st.scrollPaddingTop = top > 1 ? top + 'px' : ''; st.scrollPaddingBottom = bottom > 1 ? bottom + 'px' : '';
+}
+if(window.visualViewport) visualViewport.addEventListener('resize', () => { fitSnap(); reel(); });
+window.addEventListener('resize', fitSnap); fitSnap();
 function reel(){
-  const rows = document.querySelectorAll(listing.hidden ? '#home-items li' : '#list-items li'), mid = innerHeight / 2;
+  const rows = document.querySelectorAll(listing.hidden ? '#home-items li' : '#list-items li'), mid = screenMid();
   rows.forEach(li => {
     const r = li.getBoundingClientRect();
     const d = Math.abs(r.top + r.height/2 - mid) / (innerHeight * 0.55);
