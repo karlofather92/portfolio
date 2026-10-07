@@ -602,14 +602,26 @@ function frameImg(kind, title){
 const vpProbe = Object.assign(document.createElement('div'), {ariaHidden: 'true'});
 vpProbe.style.cssText = 'position:fixed;top:0;bottom:0;left:0;width:0;visibility:hidden;pointer-events:none';
 document.body.appendChild(vpProbe);
-function screenMid(){ const vv = window.visualViewport; return vv ? vv.offsetTop + vv.height / 2 : innerHeight / 2; }
+// where the browser actually parks the snapped row; learnt each time scrolling settles,
+// so the caption lines sit exactly on the picture even if the phone's idea of "middle" differs
+let snapMid = null;
+function screenMid(){ if(snapMid !== null) return snapMid; const vv = window.visualViewport; return vv ? vv.offsetTop + vv.height / 2 : innerHeight / 2; }
+function learnSnap(){
+  if(!document.documentElement.classList.contains('snap') || !listing.hidden) return;
+  const guess = (window.visualViewport ? visualViewport.offsetTop + visualViewport.height / 2 : innerHeight / 2);
+  let best = null, bd = Infinity;
+  document.querySelectorAll('#home-items li').forEach(li => { const r = li.getBoundingClientRect(), c = r.top + r.height / 2, d = Math.abs(c - guess); if(d < bd){ bd = d; best = c; } });
+  const h = document.querySelector('#home-items li'); 
+  if(best === null || !h || bd > h.offsetHeight / 3) return;
+  if(snapMid === null || Math.abs(snapMid - best) > 0.5){ snapMid = best; reel(); }
+}
 function fitSnap(){
   const vv = window.visualViewport; if(!vv) return;
   const lh = vpProbe.offsetHeight, top = Math.max(0, vv.offsetTop), bottom = Math.max(0, lh - vv.offsetTop - vv.height);
   const st = document.documentElement.style;
   st.scrollPaddingTop = top > 1 ? top + 'px' : ''; st.scrollPaddingBottom = bottom > 1 ? bottom + 'px' : '';
 }
-if(window.visualViewport) visualViewport.addEventListener('resize', () => { fitSnap(); reel(); });
+if(window.visualViewport) visualViewport.addEventListener('resize', () => { snapMid = null; fitSnap(); reel(); });
 window.addEventListener('resize', fitSnap); fitSnap();
 function reel(){
   const rows = document.querySelectorAll(listing.hidden ? '#home-items li' : '#list-items li'), mid = screenMid();
@@ -641,9 +653,12 @@ function reelCap(rows, mid){
   capRow = best; capHead.classList.add('swap'); clearTimeout(capTimer);
   capTimer = setTimeout(() => { capHead.innerHTML = capRow.querySelector('.head').innerHTML; capHead.classList.remove('swap'); }, 180);
 }
-let reelQueued = false;
-window.addEventListener('scroll', () => { if(!reelQueued){ reelQueued = true; requestAnimationFrame(() => { reelQueued = false; reel(); }); } }, {passive: true});
-window.addEventListener('resize', reel);
+let reelQueued = false, settleTimer = 0;
+window.addEventListener('scroll', () => {
+  if(!reelQueued){ reelQueued = true; requestAnimationFrame(() => { reelQueued = false; reel(); }); }
+  clearTimeout(settleTimer); settleTimer = setTimeout(learnSnap, 160);
+}, {passive: true});
+window.addEventListener('resize', () => { snapMid = null; reel(); });
 const phero = document.getElementById('phero'), pvid = document.getElementById('phero-video'), psound = document.getElementById('phero-sound');
 function openHero(P){
   // every project opens full screen: its film, or else its first photo
