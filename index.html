@@ -134,6 +134,14 @@ html.snap #home footer{scroll-snap-align:end}
 .phero-top{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 24px);left:clamp(16px,4vw,48px);right:clamp(16px,4vw,48px);display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.2em;color:#F2F2F2}
 .phero-top .back{color:#F2F2F2}
 .sound{font:inherit;letter-spacing:inherit;text-transform:uppercase;color:#F2F2F2;background:none;border:1px solid rgba(242,242,242,.5);padding:8px 12px;cursor:pointer}
+/* volume slider under the sound button, as wide as the button */
+.sound-box{position:relative}
+.sound-box[hidden]{display:none}
+.vol{position:absolute;left:0;right:0;top:calc(100% + 12px);-webkit-appearance:none;appearance:none;width:100%;min-width:0;height:14px;margin:0;background:transparent;cursor:pointer}
+.vol::-webkit-slider-runnable-track{height:1px;background:#F2F2F2}
+.vol::-moz-range-track{height:1px;background:#F2F2F2}
+.vol::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#fff;border:0;margin-top:-6.5px}
+.vol::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#fff;border:0}
 .phero-info{position:absolute;z-index:2;left:clamp(16px,4vw,48px);right:clamp(16px,4vw,48px);bottom:clamp(28px,6vh,64px);color:#F2F2F2;display:grid;gap:14px}
 .phero-info .sec-label{margin:0;color:rgba(242,242,242,.75)}
 .phero-info h1{margin:0;font:500 clamp(40px,9vw,120px)/1 var(--mono);letter-spacing:.06em}
@@ -228,7 +236,10 @@ html.snap #home footer{scroll-snap-align:end}
   <div class="phero-embed" id="phero-embed" hidden></div>
   <div class="phero-top">
     <a href="#objects" class="back" id="phero-back">← Back</a>
-    <button type="button" class="sound" id="phero-sound">Sound on</button>
+    <div class="sound-box" id="phero-soundbox">
+      <button type="button" class="sound" id="phero-sound">Sound on</button>
+      <input type="range" class="vol" id="phero-vol" min="0" max="1" step="0.01" value="0.7" aria-label="Volume">
+    </div>
   </div>
   <div class="phero-info">
     <p class="sec-label" id="phero-cat"></p>
@@ -615,13 +626,19 @@ function openHero(P){
     return;
   }
   if(pvid.getAttribute('src') !== P.video.src){ pvid.src = P.video.src; pvid.poster = P.video.poster; }
-  pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); psound.hidden = !!P.video.silent;
+  pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); document.getElementById('phero-soundbox').hidden = !!P.video.silent; pvid.volume = +pvol.value;
   const pr = pvid.play(); if(pr) pr.catch(() => {});
 }
 function closeHero(){
   phero.hidden = true; pvid.pause(); document.getElementById('phero-embed').innerHTML = '';
   ['list-top','list-title','list-intro'].forEach(id => document.getElementById(id).hidden = false);
 }
+const pvol = document.getElementById('phero-vol');
+// dragging the slider sets the volume and turns the sound on
+pvol.addEventListener('input', () => {
+  pvid.volume = +pvol.value;
+  if(pvid.muted && pvid.volume > 0){ pvid.muted = false; psound.textContent = 'Sound off'; psound.classList.remove('blink'); }
+});
 psound.addEventListener('click', () => { pvid.muted = !pvid.muted; psound.textContent = pvid.muted ? 'Sound on' : 'Sound off'; psound.classList.toggle('blink', pvid.muted); });
 function show(){ document.documentElement.classList.remove('snap'); home.hidden = true; listing.hidden = false; window.scrollTo(0,0); }
 function route(){
