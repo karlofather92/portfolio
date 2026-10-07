@@ -98,6 +98,9 @@ footer{padding-block:32px;border-top:1px solid var(--line);font-size:10px;letter
 .reel-cap .head{position:absolute;left:0;right:0;top:10px;display:flex;justify-content:space-between;gap:16px;font-size:11px;letter-spacing:.1em;transition:opacity .18s}
 .reel-cap .head small{font-size:9px;color:var(--muted);letter-spacing:.14em;text-align:right}
 .reel-cap .head.swap{opacity:0}
+/* "Sound on" blinks red while the film is muted */
+#phero-sound.blink{animation:sndblink 1s steps(1) infinite}
+@keyframes sndblink{0%{color:#FF2A1A;border-color:#FF2A1A}50%{color:transparent;border-color:transparent}}
 /* home page scroll snaps: each project settles in the middle of the screen */
 html.snap{scroll-snap-type:y mandatory}
 html.snap #top,html.snap #home section{scroll-snap-align:start}
@@ -612,14 +615,14 @@ function openHero(P){
     return;
   }
   if(pvid.getAttribute('src') !== P.video.src){ pvid.src = P.video.src; pvid.poster = P.video.poster; }
-  pvid.muted = true; psound.textContent = 'Sound on'; psound.hidden = !!P.video.silent;
+  pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); psound.hidden = !!P.video.silent;
   const pr = pvid.play(); if(pr) pr.catch(() => {});
 }
 function closeHero(){
   phero.hidden = true; pvid.pause(); document.getElementById('phero-embed').innerHTML = '';
   ['list-top','list-title','list-intro'].forEach(id => document.getElementById(id).hidden = false);
 }
-psound.addEventListener('click', () => { pvid.muted = !pvid.muted; psound.textContent = pvid.muted ? 'Sound on' : 'Sound off'; });
+psound.addEventListener('click', () => { pvid.muted = !pvid.muted; psound.textContent = pvid.muted ? 'Sound on' : 'Sound off'; psound.classList.toggle('blink', pvid.muted); });
 function show(){ document.documentElement.classList.remove('snap'); home.hidden = true; listing.hidden = false; window.scrollTo(0,0); }
 function route(){
   const key = location.hash.slice(1), L = LISTS[key], P = PROJECTS[key];
