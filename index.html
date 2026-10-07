@@ -486,7 +486,7 @@ window.addEventListener('resize', () => { resize(); initItems(); if(reduce) requ
 
 // project lists: each window opens its own list
 const LISTS = {
-  art: {title:'Installations', intro:'Installations and exhibitions.', items:[['Time Relay','2026','rele','rele'],['Gesamt','2022','gesamt','gesamt'],['Ants','2026','ants','ants'],['Untitled','2026','art1','art1'],['Wardrobe','2026','wardrobe','wardrobe']]},
+  art: {title:'Installations', intro:'Installations and exhibitions.', items:[['Time Relay','2026','rele','rele'],['Gesamt','2022','gesamt','gesamt'],['Ants','2026','ants','ants'],['Untitled','2026','art1','art1'],['Wardrobe','2026','wardrobe','wardrobe'],['Cloth','2026','cloth','cloth']]},
   commercial: {title:'Set design', intro:'Sets for film, video, shows and events.', items:[['Mujuice, Zodiac','2026','quarry','quarry'],['Lilu, Wings','2026','lilu','lilu'],['ADED x KOSHTA, Facing Evil','2022','aded','aded']]},
   objects: {title:'Objects', intro:'Objects and furniture.', items:[['Axe','2026','axe','axe'],['B2A Awards','2026','b2a','b2a'],['Trident','2022','trident','trident'],['Bread Chair','2026','chair','chair']]},
   fabrication: {title:'Fabrication', intro:'Making and production of pieces.', items:[['Modular Frame','2026','frame','frame'],['Sound System','2026','soundsystem','soundsystem']]}
@@ -512,6 +512,7 @@ const PROJECTS = {
     desc: ['A lamp made from a shovel.']},
   lilu: {title:'Lilu, Wings', year:'2026', sub:'Music video set', parent:'commercial', pos:'50% 0%', images: JSON.parse(document.getElementById('lilu-data').textContent),
     desc: ['Set design for the music video “Wings” by Lilu.']},
+  cloth: {title:'Cloth', year:'2026', sub:'Installation, fabric, light', parent:'art', images: [], video: {src:'cloth.mp4', poster:'cloth-poster.jpg'}},
   wardrobe: {title:'Wardrobe', year:'2026', sub:'Installation', parent:'art', images: [], video: {src:'wardrobe.mp4', poster:'wardrobe-poster.jpg'}},
   aded: {title:'ADED x KOSHTA, Facing Evil', year:'2022', sub:'Music video props', parent:'commercial', images: [], video: {src:'aded.mp4', poster:'aded-poster.jpg'},
     link: ['Watch on Vimeo', 'https://vimeo.com/761474294'],
