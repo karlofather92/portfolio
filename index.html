@@ -120,9 +120,10 @@ html.snap #home footer{scroll-snap-align:end}
 .filters sup{font-size:9px;font-variant-numeric:tabular-nums;line-height:1}
 .filters span{font-size:10px;letter-spacing:.1em;line-height:1.6}
 .filters button b{color:#fff}
-.filters button[aria-pressed="true"] b{text-decoration:underline;text-underline-offset:5px}
+.filters b i{font-style:normal}
+.filters button[aria-pressed="true"] b i{text-decoration:underline;text-underline-offset:5px}
 /* the chosen filter is red */
-.filters button[aria-pressed="true"] b{color:#FF2A1A}
+.filters button[aria-pressed="true"] b i{color:#FF2A1A}
 #home-items .head small{color:var(--muted)}
 /* project page opener: the video fills the first screen, text on top */
 .phero{position:relative;height:100svh;min-height:480px;overflow:hidden;background:#000}
@@ -558,7 +559,7 @@ function renderWorks(){
   const total = Object.values(LISTS).reduce((n, L) => n + L.items.length, 0);
   document.getElementById('filters').innerHTML = FILTERS.map(([k, name]) => {
     const n = k === 'all' ? total : LISTS[k].items.length, d = k === 'all' ? 'Every project.' : LISTS[k].intro;
-    return `<button type="button" data-f="${k}" aria-pressed="${k === filter}"><b>${esc(name)}<sup>${n}</sup></b><span>${esc(d)}</span></button>`;
+    return `<button type="button" data-f="${k}" aria-pressed="${k === filter}"><b><i>${esc(name)}</i><sup>${n}</sup></b><span>${esc(d)}</span></button>`;
   }).join('');
   const rows = [];
   for(const k of Object.keys(LISTS)) if(filter === 'all' || filter === k) for(const it of LISTS[k].items) rows.push([k, it]);
