@@ -503,7 +503,7 @@ window.addEventListener('resize', () => { resize(); initItems(); if(reduce) requ
 // project lists: each window opens its own list
 const LISTS = {
   art: {title:'Installations', intro:'Installations and exhibitions.', items:[['Time Relay','2026','rele','rele'],['Gesamt','2022','gesamt','gesamt'],['Ants','2026','ants','ants'],['Grumble','2026','art1','art1'],['Wardrobe','2026','wardrobe','wardrobe'],['Cloth','2026','cloth','cloth']]},
-  commercial: {title:'Set design', intro:'Sets for film, video, shows and events.', items:[['Mujuice, Zodiac','2026','quarry','quarry'],['Lilu, Wings','2026','lilu','lilu'],['ADED x KOSHTA, Facing Evil','2022','aded','aded'],['Aurora','2026','aurora','aurora']]},
+  commercial: {title:'Set design', intro:'Sets for film, video, shows and events.', items:[['Mujuice, Zodiac','2026','quarry','quarry'],['Lilu, Wings','2026','lilu','lilu'],['ADED x KOSHTA, Facing Evil','2022','aded','aded'],['Aurora','2026','aurora','aurora'],['Tigran Hamasyan, Yerevan','2026','hamasyan','hamasyan']]},
   objects: {title:'Objects', intro:'Objects and furniture.', items:[['Axe','2026','axe','axe'],['B2A Awards','2026','b2a','b2a'],['Trident','2022','trident','trident'],['Bread Chair','2026','chair','chair']]},
   fabrication: {title:'Fabrication', intro:'Making and production of pieces.', items:[['Modular Frame','2026','frame','frame'],['Sound System','2026','soundsystem','soundsystem'],['In the Presence of Salmon','2026','salmon','salmon'],['Anton Reva, HIDE Gallery','2026','cast','cast']]}
 };
@@ -536,6 +536,7 @@ const PROJECTS = {
     desc: ['Set design for the music video “Wings” by Lilu.']},
   cloth: {title:'Cloth', year:'2026', sub:'Installation, fabric, light', parent:'art', images: [], video: {src:'cloth.mp4', poster:'cloth-poster.jpg'}},
   aurora: {title:'Aurora', year:'2026', sub:'Set design', parent:'commercial', images: [], video: {src:'aurora.mp4', poster:'aurora-poster.jpg'}},
+  hamasyan: {title:'Tigran Hamasyan, Yerevan', year:'2026', sub:'Concert stage', parent:'commercial', images: [], video: {src:'hamasyan.mp4', poster:'hamasyan-poster.jpg', pos:'50% 56%'}},
   wardrobe: {title:'Wardrobe', year:'2026', sub:'Installation', parent:'art', images: [], video: {src:'wardrobe.mp4', poster:'wardrobe-poster.jpg'}},
   aded: {title:'ADED x KOSHTA, Facing Evil', year:'2022', sub:'Music video props', parent:'commercial', images: [], video: {src:'aded.mp4', poster:'aded-poster.jpg'},
     link: ['Watch on Vimeo', 'https://vimeo.com/761474294'],
@@ -574,7 +575,7 @@ document.getElementById('filters').addEventListener('click', e => {
   filter = b.dataset.f; renderWorks();
 });
 function frameImg(kind, title){
-  if(PROJECTS[kind] && PROJECTS[kind].video){ const v = PROJECTS[kind].reel || PROJECTS[kind].video; return `<video src="${v.src}" poster="${v.poster}" muted autoplay loop playsinline preload="metadata"></video>`; }
+  if(PROJECTS[kind] && PROJECTS[kind].video){ const v = PROJECTS[kind].reel || PROJECTS[kind].video; return `<video src="${v.src}" poster="${v.poster}"${v.pos ? ` style="object-position:${v.pos}"` : ''} muted autoplay loop playsinline preload="metadata"></video>`; }
   if(PROJECTS[kind] && PROJECTS[kind].images.length) return `<img src="${PROJECTS[kind].images[0]}" alt="${esc(PROJECTS[kind].title)}"${PROJECTS[kind].pos ? ` style="object-position:${PROJECTS[kind].pos}"` : ''}${PROJECTS[kind].fit ? ` style="object-fit:${PROJECTS[kind].fit}"` : ''}${PROJECTS[kind].pan ? ' class="pan"' : ''}>`;
   return `<span class="ph">${PROJECTS[kind] ? esc(PROJECTS[kind].title) : 'image'}</span>`;
 }
@@ -636,6 +637,7 @@ function openHero(P){
     return;
   }
   if(pvid.getAttribute('src') !== P.video.src){ pvid.src = P.video.src; pvid.poster = P.video.poster; }
+  pvid.style.objectPosition = P.video.pos || '';
   pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); document.getElementById('phero-soundbox').hidden = !!P.video.silent; pvid.volume = +pvol.value;
   const pr = pvid.play(); if(pr) pr.catch(() => {});
 }
