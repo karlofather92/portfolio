@@ -511,7 +511,7 @@ const AXE = JSON.parse(document.getElementById('axe-data').textContent);
 const SET = JSON.parse(document.getElementById('set-data').textContent);
 document.getElementById('set-cover').src = SET[0];
 const PROJECTS = {
-  axe: {title:'Axe', year:'2026', sub:'Metal', parent:'objects', images: AXE, video: {src:'axe-hero.mp4', poster:'axe-hero.jpg'}, end: ['axe.mp4', 'axe-poster.jpg']},
+  axe: {title:'Axe', year:'2026', sub:'Metal', parent:'objects', images: AXE, video: {src:'axe-hero.mp4', poster:'axe-hero.jpg'}, end: ['axe.mp4', 'axe-poster.jpg'], figs: [['axe-sketch.webp','Sketch.']]},
   quarry: {title:'Mujuice, Zodiac', year:'2026', sub:'Music video set', parent:'commercial', images: SET,
     desc: ['Set design for the music video “Zodiac” by Mujuice.']},
   b2a: {title:'B2A Awards', year:'2026', sub:'Award statuettes', parent:'objects', images: JSON.parse(document.getElementById('b2a-data').textContent),
