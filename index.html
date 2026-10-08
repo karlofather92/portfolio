@@ -67,6 +67,10 @@ footer{padding-block:32px;border-top:1px solid var(--line);font-size:10px;letter
 .list-title{font:500 clamp(24px,4vw,44px)/1.15 var(--mono);letter-spacing:.1em;margin:clamp(24px,6vw,64px) 0 16px;text-wrap:balance}
 .list-desc{margin:-24px 0 48px;max-width:62ch;font-size:12px;line-height:1.8;letter-spacing:.08em;text-transform:none}
 .list-desc p{margin:0 0 14px}
+/* credits close the description, under a thin line */
+.list-desc .credits{margin:24px 0 0;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:max-content 1fr;gap:8px 24px;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.list-desc .credits dt{color:var(--muted)}
+.list-desc .credits dd{margin:0}
 .phero:not([hidden]) + #listing .list-desc{margin-top:clamp(32px,6vw,64px)}
 .list-intro{margin:0 0 48px;font-size:12px;color:var(--muted);max-width:52ch}
 /* project lists: a vertical reel, the row in the middle of the screen grows */
@@ -551,7 +555,8 @@ const PROJECTS = {
   gesamt: {title:'Gesamt', year:'2022', sub:'Performance, installation', parent:'art', images: [], video: {src:'gesamt-loop.mp4', poster:'gesamt-poster.jpg', silent: true}, full: ['gesamt.mp4', 'gesamt-poster.jpg'], reel: {src:'gesamt-reel.mp4', poster:'gesamt-reel.jpg'},
     desc: ["GESAMT is a labour extended in time: a performance at POLE cultural space during KOSHTA WEEKEND 2022, made together with the GESAMT collective when I worked with them.", "What is labour, and is it obvious enough? As production designers we kept meeting the same misconception about how things come together into an object, a set or an installation. A finished thing gives an impression that swallows the story of how that thing came to be.", "So the idea of the performance was born: to show the temporal and physical extension of our own labour.", "The month of preparation was recorded as a timeline, a to-do list of the project covering every stage of its making, from theory to material production. The list showed the invisible part of our work alongside the visible result.", "The performance took place on 27 August: we assembled the installation in front of the audience. It was made of six panels in different techniques.", "Each panel carried part of the phrase “GESAMT is a labour extended in time”, and each object only made sense together with the others. That is another dimension of the work: collaboration, collective labour, a state where every member of the group is essential.", "Sound mattered as much as action: the installation was surrounded by four-channel audio recreating the sounds of our workshop.", "“Watching this process was like working next to you,” one visitor said. That was very valuable feedback. Thank you for watching."]},
   rele: {title:'Time Relay', year:'2025', sub:'Installation from flea market finds', parent:'art', images: [], films: [['rele-2.mp4','rele-2.jpg'],['rele-3.mp4','rele-3.jpg']], figs: [['rele-drum.webp','A drum made from an old banner and an old barrel.']], video: {src:'rele.mp4', poster:'rele-poster.jpg'},
-    desc: ['An installation created during the Notation Laboratory, part of the HOSQ laboratory.', 'Sound coming out of flea market finds, where the past takes on a new rhythmic form.', 'Created by Yuriy Avdeev and Robert Poghosyan.']},
+    desc: ['An installation created during the Notation Laboratory, part of the HOSQ laboratory.', 'Sound coming out of flea market finds, where the past takes on a new rhythmic form.', 'Created by Yuriy Avdeev and Robert Poghosyan.'],
+    credits: [['Photo', 'Photographer name'], ['HOSQ', 'HOSQ credit']]},
   art1: {title:'Grumble', year:'2026', sub:'Installation', parent:'art', images: [...JSON.parse(document.getElementById('art1-data').textContent), document.querySelector('#w-art img').src]}
 };
 const FILTERS = [['all','All'],['art','Installations'],['commercial','Set design'],['objects','Objects'],['fabrication','Fabrication']];
@@ -727,7 +732,8 @@ function route(){
     document.getElementById('list-intro').textContent = P.sub + ' · ' + P.year;
     document.getElementById('list-count').textContent = LISTS[P.parent].title;
     const desc = document.getElementById('list-desc');
-    desc.innerHTML = (P.desc || []).map(t => `<p>${esc(t)}</p>`).join('') + (P.link ? `<p><a href="${P.link[1]}" target="_blank" rel="noopener">${esc(P.link[0])} ↗</a></p>` : ''); desc.hidden = !P.desc;
+    desc.innerHTML = (P.desc || []).map(t => `<p>${esc(t)}</p>`).join('') + (P.link ? `<p><a href="${P.link[1]}" target="_blank" rel="noopener">${esc(P.link[0])} ↗</a></p>` : '') +
+      (P.credits ? `<dl class="credits">${P.credits.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''); desc.hidden = !P.desc;
     gal.classList.toggle('single', (P.video ? P.images.length : P.images.length - 1) + (P.films || []).length + (P.figs || []).length === 1);
     gal.innerHTML = (P.full ? `<video class="film" src="${P.full[0]}" poster="${P.full[1]}" controls playsinline preload="none"></video>` : '') + (P.vimeo ? `<iframe class="vplayer" src="https://player.vimeo.com/video/${P.vimeo}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(P.title)}"></iframe>` : '') + (P.films || []).map(([src, poster]) => `<video class="film" src="${src}" poster="${poster}" muted autoplay loop playsinline></video>`).join('') +
       (P.figs || []).map(([src, cap]) => `<figure class="fig"><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('') + (P.video ? P.images : P.images.slice(1)).map((src,i) => `<img src="${src}" alt="${esc(P.title)}, photo ${i+1}" loading="lazy">`).join('') +
