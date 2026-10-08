@@ -137,6 +137,10 @@ html.snap #home footer{scroll-snap-align:end}
 .phero-embed iframe{position:absolute;top:50%;left:50%;width:max(100%,177.78vh);height:max(100%,56.25vw);transform:translate(-50%,-50%);border:0}
 .gallery .vplayer{column-span:all;width:100%;aspect-ratio:16/9;border:0;display:block;margin:0 0 24px;background:#000}
 .phero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0) 45%),linear-gradient(to bottom,rgba(0,0,0,.45),rgba(0,0,0,0) 20%);pointer-events:none}
+/* the description sits on the first screen under Back when there is room for it */
+.phero-desc{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 64px);left:clamp(16px,4vw,48px);margin:0;color:#F2F2F2;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+.phero-desc .credits{border-top-color:rgba(242,242,242,.3)}
+.phero-desc .credits dt{color:rgba(242,242,242,.6)}
 .phero-top{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 24px);left:clamp(16px,4vw,48px);right:clamp(16px,4vw,48px);display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.2em;color:#F2F2F2}
 .phero-top .back{color:#F2F2F2}
 .sound{font:inherit;letter-spacing:inherit;text-transform:uppercase;color:#F2F2F2;background:none;border:1px solid rgba(242,242,242,.5);padding:8px 12px;cursor:pointer}
@@ -249,6 +253,7 @@ html.snap #home footer{scroll-snap-align:end}
       <input type="range" class="vol" id="phero-vol" min="0" max="1" step="0.01" value="0.7" aria-label="Volume">
     </div>
   </div>
+  <div class="phero-desc list-desc" id="phero-desc" hidden></div>
   <div class="phero-info">
     <p class="sec-label" id="phero-cat"></p>
     <h1 id="phero-title"></h1>
@@ -555,8 +560,9 @@ const PROJECTS = {
   gesamt: {title:'Gesamt', year:'2022', sub:'Performance, installation', parent:'art', images: [], video: {src:'gesamt-loop.mp4', poster:'gesamt-poster.jpg', silent: true}, full: ['gesamt.mp4', 'gesamt-poster.jpg'], reel: {src:'gesamt-reel.mp4', poster:'gesamt-reel.jpg'},
     desc: ["GESAMT is a labour extended in time: a performance at POLE cultural space during KOSHTA WEEKEND 2022, made together with the GESAMT collective when I worked with them.", "What is labour, and is it obvious enough? As production designers we kept meeting the same misconception about how things come together into an object, a set or an installation. A finished thing gives an impression that swallows the story of how that thing came to be.", "So the idea of the performance was born: to show the temporal and physical extension of our own labour.", "The month of preparation was recorded as a timeline, a to-do list of the project covering every stage of its making, from theory to material production. The list showed the invisible part of our work alongside the visible result.", "The performance took place on 27 August: we assembled the installation in front of the audience. It was made of six panels in different techniques.", "Each panel carried part of the phrase “GESAMT is a labour extended in time”, and each object only made sense together with the others. That is another dimension of the work: collaboration, collective labour, a state where every member of the group is essential.", "Sound mattered as much as action: the installation was surrounded by four-channel audio recreating the sounds of our workshop.", "“Watching this process was like working next to you,” one visitor said. That was very valuable feedback. Thank you for watching."]},
   rele: {title:'Time Relay', year:'2025', sub:'Installation from flea market finds', parent:'art', images: [], films: [['rele-2.mp4','rele-2.jpg'],['rele-3.mp4','rele-3.jpg']], figs: [['rele-drum.webp','A drum made from an old banner and an old barrel.']], video: {src:'rele.mp4', poster:'rele-poster.jpg'},
-    desc: ['An installation created during the Notation Laboratory, part of the HOSQ laboratory.', 'Sound coming out of flea market finds, where the past takes on a new rhythmic form.', 'Created by Yuriy Avdeev and Robert Poghosyan.'],
-    credits: [['Concept', 'Concept author'], ['Photo', 'Photographer name'], ['HOSQ', 'HOSQ credit']]},
+    desc: ['An installation created during the Notation Laboratory, part of the HOSQ laboratory.', 'Sound coming out of flea market finds, where the past takes on a new rhythmic form.'],
+    descTop: true,
+    credits: [['Authors', 'Yuriy Avdeev, Robert Poghosyan'], ['Concept', 'Concept author'], ['Photo', 'Photographer name'], ['HOSQ', 'HOSQ credit']]},
   art1: {title:'Grumble', year:'2026', sub:'Installation', parent:'art', images: [...JSON.parse(document.getElementById('art1-data').textContent), document.querySelector('#w-art img').src]}
 };
 const FILTERS = [['all','All'],['art','Installations'],['commercial','Set design'],['objects','Objects'],['fabrication','Fabrication']];
@@ -666,6 +672,16 @@ window.addEventListener('scroll', () => {
 }, {passive: true});
 window.addEventListener('resize', () => { snapMid = null; reel(); });
 const phero = document.getElementById('phero'), pvid = document.getElementById('phero-video'), psound = document.getElementById('phero-sound');
+// projects marked descTop show their description on the first screen if it fits above the title, otherwise below
+function heroDesc(P){
+  const desc = document.getElementById('list-desc'), hd = document.getElementById('phero-desc'), info = document.querySelector('.phero-info');
+  hd.innerHTML = ''; hd.hidden = true;
+  if(phero.hidden || !P || !P.descTop || !desc.innerHTML.trim()) { desc.hidden = !desc.innerHTML.trim(); return; }
+  hd.innerHTML = desc.innerHTML; hd.hidden = false;
+  if(hd.getBoundingClientRect().bottom > info.getBoundingClientRect().top - 32){ hd.innerHTML = ''; hd.hidden = true; desc.hidden = false; }
+  else desc.hidden = true;
+}
+window.addEventListener('resize', () => { if(!phero.hidden) heroDesc(PROJECTS[location.hash.slice(1)]); });
 function openHero(P){
   // every project opens full screen: its film, or else its first photo
   const on = true;
@@ -733,7 +749,7 @@ function route(){
     document.getElementById('list-count').textContent = LISTS[P.parent].title;
     const desc = document.getElementById('list-desc');
     desc.innerHTML = (P.desc || []).map(t => `<p>${esc(t)}</p>`).join('') + (P.link ? `<p><a href="${P.link[1]}" target="_blank" rel="noopener">${esc(P.link[0])} ↗</a></p>` : '') +
-      (P.credits ? `<dl class="credits">${P.credits.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''); desc.hidden = !P.desc;
+      (P.credits ? `<dl class="credits">${P.credits.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''); desc.hidden = !P.desc; heroDesc(P);
     gal.classList.toggle('single', (P.video ? P.images.length : P.images.length - 1) + (P.films || []).length + (P.figs || []).length === 1);
     gal.innerHTML = (P.full ? `<video class="film" src="${P.full[0]}" poster="${P.full[1]}" controls playsinline preload="none"></video>` : '') + (P.vimeo ? `<iframe class="vplayer" src="https://player.vimeo.com/video/${P.vimeo}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(P.title)}"></iframe>` : '') + (P.films || []).map(([src, poster]) => `<video class="film" src="${src}" poster="${poster}" muted autoplay loop playsinline></video>`).join('') +
       (P.figs || []).map(([src, cap]) => `<figure class="fig"><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('') + (P.video ? P.images : P.images.slice(1)).map((src,i) => `<img src="${src}" alt="${esc(P.title)}, photo ${i+1}" loading="lazy">`).join('') +
