@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  color-scheme:dark;
-  --bg:#000000; --ink:#F2F2F2; --muted:#9A9A9A; --line:#2A2A2A; --panel:#141414;
+  color-scheme:light;
+  --bg:#B3B3B3; --ink:#242424; --muted:#5C5C5C; --line:#8C8C8C; --panel:#A6A6A6;
   --mono:"Roboto Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
@@ -82,7 +82,7 @@ footer{padding-block:32px;border-top:1px solid var(--line);font-size:10px;letter
 .projects .frame{align-items:center}
 /* rows away from the middle fade to 30% */
 .projects .frame{opacity:calc(.3 + .7 * var(--t,0) * var(--t,0));transition:opacity .15s linear}
-.projects .frame video,.projects .frame img,.projects .frame .ph{width:min(100%, calc(var(--fh) * 2.3188));height:auto;aspect-ratio:1280/552;object-fit:cover;display:block;background:#000}
+.projects .frame video,.projects .frame img,.projects .frame .ph{width:min(100%, calc(var(--fh) * 2.3188));height:auto;aspect-ratio:1280/552;object-fit:cover;display:block;background:var(--panel)}
 .projects .frame img.pan{animation:pan 14s ease-in-out infinite alternate}
 @keyframes pan{from{object-position:50% 0%}to{object-position:50% 100%}}
 @media (prefers-reduced-motion:reduce){.projects .frame img.pan{animation:none}}
@@ -120,7 +120,7 @@ html.snap #home footer{scroll-snap-align:end}
 .filters b{font-weight:500;font-size:12px;display:flex;gap:6px;align-items:flex-start}
 .filters sup{font-size:9px;font-variant-numeric:tabular-nums;line-height:1}
 .filters span{font-size:10px;letter-spacing:.1em;line-height:1.6}
-.filters button b{color:#fff}
+.filters button b{color:var(--ink)}
 .filters b i{font-style:normal}
 .filters button[aria-pressed="true"] b i{text-decoration:underline;text-underline-offset:5px}
 /* the chosen filter is red */
