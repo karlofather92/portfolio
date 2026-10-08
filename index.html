@@ -166,6 +166,16 @@ html.snap #home footer{scroll-snap-align:end}
 .gallery .fig img{margin:0}
 .gallery .fig figcaption{font-size:12px;line-height:1.8;letter-spacing:.08em;text-transform:none;max-width:40ch}
 @media (max-width:600px){.gallery .fig{grid-template-columns:1fr}}
+.gallery .vgrid{column-span:all;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px;margin:0 0 24px}
+@media (max-width:600px){.gallery .vgrid{grid-template-columns:1fr}}
+.vtile{position:relative;aspect-ratio:8/3;background:#000;overflow:hidden}
+.vtile video{width:100%;height:100%;object-fit:cover;display:block}
+.vtile.empty{display:grid;place-items:center;background:var(--panel);font-size:9px;letter-spacing:.2em;color:var(--muted)}
+/* vertical volume pill on the right of each film: drag up for sound, down to mute */
+.vslider{position:absolute;right:4%;top:10%;bottom:10%;width:clamp(28px,3.4vw,44px);border-radius:999px;background:rgba(160,160,160,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow:hidden;cursor:ns-resize;touch-action:none;outline-offset:3px}
+.vslider .fill{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:999px;min-height:clamp(28px,3.4vw,44px)}
+.vslider svg{position:absolute;left:50%;bottom:clamp(6px,.8vw,11px);width:56%;transform:translateX(-50%);color:#111;pointer-events:none}
+.vslider .x{display:none}.vslider.mute .x{display:inline}.vslider.mute .w{display:none}
 .gallery.single{columns:1;max-width:760px;margin-inline:auto}
 @media (max-width:600px){.gallery{columns:1}}
 
@@ -559,7 +569,7 @@ const PROJECTS = {
     desc: ['A chair made from bread.']},
   gesamt: {title:'Gesamt', year:'2022', sub:'Performance, installation', parent:'art', images: [], video: {src:'gesamt-loop.mp4', poster:'gesamt-poster.jpg', silent: true}, full: ['gesamt.mp4', 'gesamt-poster.jpg'], reel: {src:'gesamt-reel.mp4', poster:'gesamt-reel.jpg'},
     desc: ["GESAMT is a labour extended in time: a performance at POLE cultural space during KOSHTA WEEKEND 2022, made together with the GESAMT collective when I worked with them.", "What is labour, and is it obvious enough? As production designers we kept meeting the same misconception about how things come together into an object, a set or an installation. A finished thing gives an impression that swallows the story of how that thing came to be.", "So the idea of the performance was born: to show the temporal and physical extension of our own labour.", "The month of preparation was recorded as a timeline, a to-do list of the project covering every stage of its making, from theory to material production. The list showed the invisible part of our work alongside the visible result.", "The performance took place on 27 August: we assembled the installation in front of the audience. It was made of six panels in different techniques.", "Each panel carried part of the phrase “GESAMT is a labour extended in time”, and each object only made sense together with the others. That is another dimension of the work: collaboration, collective labour, a state where every member of the group is essential.", "Sound mattered as much as action: the installation was surrounded by four-channel audio recreating the sounds of our workshop.", "“Watching this process was like working next to you,” one visitor said. That was very valuable feedback. Thank you for watching."]},
-  rele: {title:'Time Relay', year:'2025', sub:'Installation from flea market finds', parent:'art', images: [], films: [['rele-2.mp4','rele-2.jpg'],['rele-3.mp4','rele-3.jpg']], figs: [['rele-drum.webp','A drum made from an old banner and an old barrel.']], video: {src:'rele.mp4', poster:'rele-poster.jpg'},
+  rele: {title:'Time Relay', year:'2025', sub:'Installation from flea market finds', parent:'art', images: [], grid: [['rele-2.mp4','rele-2.jpg'],['rele-3.mp4','rele-3.jpg'],null,null], figs: [['rele-drum.webp','A drum made from an old banner and an old barrel.']], video: {src:'rele.mp4', poster:'rele-poster.jpg'},
     desc: ['An installation created during the Notation Laboratory, part of the HOSQ laboratory.', 'Sound coming out of flea market finds, where the past takes on a new rhythmic form.'],
     descTop: true,
     credits: [['Authors', 'Yuriy Avdeev, Robert Poghosyan'], ['Concept', 'Concept author'], ['Photo', 'Photographer name'], ['HOSQ', 'HOSQ credit']]},
@@ -672,6 +682,28 @@ window.addEventListener('scroll', () => {
 }, {passive: true});
 window.addEventListener('resize', () => { snapMid = null; reel(); });
 const phero = document.getElementById('phero'), pvid = document.getElementById('phero-video'), psound = document.getElementById('phero-sound');
+const VSLIDER = `<div class="vslider mute" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" style="height:0"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><g class="w"><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/></g><g class="x"><path d="M16 9l5 6M21 9l-5 6"/></g></svg></div>`;
+function setVol(sl, v){
+  v = Math.min(1, Math.max(0, v));
+  const vid = sl.parentElement.querySelector('video');
+  sl.querySelector('.fill').style.height = (v * 100) + '%';
+  sl.classList.toggle('mute', v === 0); sl.setAttribute('aria-valuenow', Math.round(v * 100));
+  if(vid){ vid.volume = v; vid.muted = v === 0; if(v > 0) vid.play().catch(() => {}); }
+}
+document.addEventListener('pointerdown', e => {
+  const sl = e.target.closest('.vslider'); if(!sl) return;
+  e.preventDefault(); sl.setPointerCapture(e.pointerId);
+  const at = ev => { const r = sl.getBoundingClientRect(); setVol(sl, (r.bottom - ev.clientY) / r.height); };
+  at(e);
+  const mv = ev => at(ev), up = () => { sl.removeEventListener('pointermove', mv); sl.removeEventListener('pointerup', up); sl.removeEventListener('pointercancel', up); };
+  sl.addEventListener('pointermove', mv); sl.addEventListener('pointerup', up); sl.addEventListener('pointercancel', up);
+});
+document.addEventListener('keydown', e => {
+  const sl = e.target.closest && e.target.closest('.vslider'); if(!sl) return;
+  const v = +sl.getAttribute('aria-valuenow') / 100;
+  if(e.key === 'ArrowUp' || e.key === 'ArrowRight'){ setVol(sl, v + .1); e.preventDefault(); }
+  if(e.key === 'ArrowDown' || e.key === 'ArrowLeft'){ setVol(sl, v - .1); e.preventDefault(); }
+});
 // projects marked descTop show their description on the first screen if it fits above the title, otherwise below
 function heroDesc(P){
   const desc = document.getElementById('list-desc'), hd = document.getElementById('phero-desc'), info = document.querySelector('.phero-info');
@@ -750,8 +782,9 @@ function route(){
     const desc = document.getElementById('list-desc');
     desc.innerHTML = (P.desc || []).map(t => `<p>${esc(t)}</p>`).join('') + (P.link ? `<p><a href="${P.link[1]}" target="_blank" rel="noopener">${esc(P.link[0])} ↗</a></p>` : '') +
       (P.credits ? `<dl class="credits">${P.credits.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>` : ''); desc.hidden = !P.desc; heroDesc(P);
-    gal.classList.toggle('single', (P.video ? P.images.length : P.images.length - 1) + (P.films || []).length + (P.figs || []).length === 1);
+    gal.classList.toggle('single', (P.video ? P.images.length : P.images.length - 1) + (P.films || []).length + (P.grid ? 2 : 0) + (P.figs || []).length === 1);
     gal.innerHTML = (P.full ? `<video class="film" src="${P.full[0]}" poster="${P.full[1]}" controls playsinline preload="none"></video>` : '') + (P.vimeo ? `<iframe class="vplayer" src="https://player.vimeo.com/video/${P.vimeo}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(P.title)}"></iframe>` : '') + (P.films || []).map(([src, poster]) => `<video class="film" src="${src}" poster="${poster}" muted autoplay loop playsinline></video>`).join('') +
+      (P.grid ? `<div class="vgrid">${P.grid.map(f => f ? `<div class="vtile"><video src="${f[0]}" poster="${f[1]}" muted autoplay loop playsinline></video>${VSLIDER}</div>` : '<div class="vtile empty">Video coming soon</div>').join('')}</div>` : '') +
       (P.figs || []).map(([src, cap]) => `<figure class="fig"><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('') + (P.video ? P.images : P.images.slice(1)).map((src,i) => `<img src="${src}" alt="${esc(P.title)}, photo ${i+1}" loading="lazy">`).join('') +
       (P.end ? `<video class="film" src="${P.end[0]}" poster="${P.end[1]}" controls playsinline preload="none"></video>` : '');
     items.querySelectorAll('video').forEach(v => v.pause());
