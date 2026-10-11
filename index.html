@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Iurii Portfolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -682,13 +683,29 @@ window.addEventListener('scroll', () => {
 }, {passive: true});
 window.addEventListener('resize', () => { snapMid = null; reel(); });
 const phero = document.getElementById('phero'), pvid = document.getElementById('phero-video'), psound = document.getElementById('phero-sound');
+// iPad/iPhone Safari ignores video.volume, so there the loudness goes through a Web Audio gain
+const VOL_LOCKED = (() => { try { const t = document.createElement('video'); t.volume = 0.5; return t.volume !== 0.5; } catch(e) { return false; } })();
+let actx = null; const gains = new WeakMap();
+function setVideoVol(vid, v){
+  if(!VOL_LOCKED){ vid.volume = v; return; }
+  try{
+    if(!actx){ const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return; actx = new AC(); }
+    if(actx.state !== 'running') actx.resume().catch(() => {});
+    let g = gains.get(vid);
+    if(!g){ const src = actx.createMediaElementSource(vid); g = actx.createGain(); src.connect(g); g.connect(actx.destination); gains.set(vid, g); }
+    g.gain.value = v;
+  }catch(e){}
+}
+// Safari only unlocks audio on the end of a touch, so resume it there too
+document.addEventListener('pointerup', () => { if(actx && actx.state !== 'running') actx.resume().catch(() => {}); }, true);
+document.addEventListener('touchend', () => { if(actx && actx.state !== 'running') actx.resume().catch(() => {}); }, true);
 const VSLIDER = `<div class="vslider mute" role="slider" tabindex="0" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" style="height:0"></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><g class="w"><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a7.5 7.5 0 0 1 0 11"/></g><g class="x"><path d="M16 9l5 6M21 9l-5 6"/></g></svg></div>`;
 function setVol(sl, v){
   v = Math.min(1, Math.max(0, v));
   const vid = sl.parentElement.querySelector('video');
   sl.querySelector('.fill').style.height = (v * 100) + '%';
   sl.classList.toggle('mute', v === 0); sl.setAttribute('aria-valuenow', Math.round(v * 100));
-  if(vid){ vid.volume = v; vid.muted = v === 0; if(v > 0) vid.play().catch(() => {}); }
+  if(vid){ setVideoVol(vid, v); vid.muted = v === 0; if(v > 0) vid.play().catch(() => {}); }
 }
 document.addEventListener('pointerdown', e => {
   const sl = e.target.closest('.vslider'); if(!sl) return;
@@ -738,7 +755,7 @@ function openHero(P){
   }
   if(pvid.getAttribute('src') !== P.video.src){ pvid.src = P.video.src; pvid.poster = P.video.poster; }
   pvid.style.objectPosition = P.video.pos || '';
-  pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); document.getElementById('phero-soundbox').hidden = !!P.video.silent; pvid.volume = +pvol.value;
+  pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); document.getElementById('phero-soundbox').hidden = !!P.video.silent; if(!VOL_LOCKED) pvid.volume = +pvol.value;
   const pr = pvid.play(); if(pr) pr.catch(() => {});
 }
 function closeHero(){
@@ -748,10 +765,11 @@ function closeHero(){
 const pvol = document.getElementById('phero-vol');
 // dragging the slider sets the volume and turns the sound on
 pvol.addEventListener('input', () => {
-  pvid.volume = +pvol.value;
-  if(pvid.muted && pvid.volume > 0){ pvid.muted = false; psound.textContent = 'Sound off'; psound.classList.remove('blink'); }
+  const v = +pvol.value; setVideoVol(pvid, v);
+  if(v === 0 && !pvid.muted){ pvid.muted = true; psound.textContent = 'Sound on'; psound.classList.add('blink'); }
+  if(pvid.muted && v > 0){ pvid.muted = false; psound.textContent = 'Sound off'; psound.classList.remove('blink'); }
 });
-psound.addEventListener('click', () => { pvid.muted = !pvid.muted; psound.textContent = pvid.muted ? 'Sound on' : 'Sound off'; psound.classList.toggle('blink', pvid.muted); });
+psound.addEventListener('click', () => { setVideoVol(pvid, +pvol.value); pvid.muted = !pvid.muted; psound.textContent = pvid.muted ? 'Sound on' : 'Sound off'; psound.classList.toggle('blink', pvid.muted); });
 function show(){ document.documentElement.classList.remove('snap'); home.hidden = true; listing.hidden = false; window.scrollTo(0,0); }
 function route(){
   const key = location.hash.slice(1), L = LISTS[key], P = PROJECTS[key];
@@ -801,3 +819,5 @@ renderWorks();
 route();
 if(!home.hidden) document.documentElement.classList.add('snap');
 </script>
+
+</body></html>
