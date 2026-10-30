@@ -167,6 +167,9 @@ html.snap #home footer{scroll-snap-align:end}
 .gallery .film{column-span:all;margin-bottom:24px;width:100%;height:auto;display:block;background:#000}
 .gallery .fig{column-span:all;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center;margin:0 0 24px}
 .gallery .fig img{margin:0}
+.gallery .jrow{column-span:all;display:flex;gap:24px;margin:0 0 24px}
+.gallery .jrow img{flex-basis:0;min-width:0;margin:0}
+@media(max-width:600px){.gallery .jrow{flex-direction:column}.gallery .jrow img{flex:none!important;width:100%}}
 .gallery .fig figcaption{font-size:12px;line-height:1.8;letter-spacing:.08em;text-transform:none;max-width:40ch}
 @media (max-width:600px){.gallery .fig{grid-template-columns:1fr}}
 .gallery .vgrid{column-span:all;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px;margin:0 0 24px}
@@ -566,7 +569,9 @@ const PROJECTS = {
   aded: {title:'ADED x KOSHTA, Facing Evil', year:'2022', sub:'Music video props', parent:'commercial', images: [], video: {src:'aded.mp4', poster:'aded-poster.jpg'},
     link: ['Watch on Vimeo', 'https://vimeo.com/761474294'],
     desc: ['For the music video for “Facing Evil” by ADED, we invented biomechanical automatic spraying tools: simple to use, but complex to make.']},
-  ants: {title:'Colony', year:'2021', sub:'Polyurethane foam, metal, casting', parent:'art', images: [...JSON.parse(document.getElementById('ants-data').textContent), 'ants-4.webp', 'ants-5.webp', 'ants-6.webp', 'ants-7.webp', 'ants-8.webp', 'ants-9.webp', 'ants-10.webp', 'ants-11.webp', 'ants-12.webp', 'ants-13.webp'],
+  ants: {title:'Colony', year:'2021', sub:'Polyurethane foam, metal, casting', parent:'art', images: JSON.parse(document.getElementById('ants-data').textContent),
+    // gallery laid out in rows; photos in a row share one height
+    rows: [[['ants-9.webp',1500,1125]], [['ants-4.webp',1237,1600], ['ants-10.webp',1600,1200], ['ants-8.webp',1200,1600]], [['ants-5.webp',1600,1200], ['ants-6.webp',1600,1200]], [['ants-13.webp',1600,1200]], [['ants-11.webp',1600,1200], ['ants-12.webp',1600,1200], ['ants-7.webp',1600,1200]]],
     desc: ['Ten black and red ants for the Mutabor club in Moscow.', 'A project about transforming a familiar image by changing its scale. The ants become a monumental colony that invades the club and changes how the space is perceived.'],
     descTop: true,
     credits: [['Author', 'Yuriy Avdeev']]},
@@ -807,7 +812,7 @@ function route(){
     gal.classList.toggle('single', (P.video ? P.images.length : P.images.length - 1) + (P.films || []).length + (P.grid ? 2 : 0) + (P.figs || []).length === 1);
     gal.innerHTML = (P.full ? `<video class="film" src="${P.full[0]}" poster="${P.full[1]}" controls playsinline preload="none"></video>` : '') + (P.vimeo ? `<iframe class="vplayer" src="https://player.vimeo.com/video/${P.vimeo}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(P.title)}"></iframe>` : '') + (P.films || []).map(([src, poster]) => `<video class="film" src="${src}" poster="${poster}" muted autoplay loop playsinline></video>`).join('') +
       (P.grid ? `<div class="vgrid">${P.grid.map(f => f ? `<div class="vtile"><video src="${f[0]}" poster="${f[1]}" muted autoplay loop playsinline></video>${VSLIDER}</div>` : '<div class="vtile empty">Video coming soon</div>').join('')}</div>` : '') +
-      (P.figs || []).map(([src, cap]) => `<figure class="fig"><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('') + (P.video ? P.images : P.images.slice(1)).map((src,i) => `<img src="${src}" alt="${esc(P.title)}, photo ${i+1}" loading="lazy">`).join('') +
+      (P.figs || []).map(([src, cap]) => `<figure class="fig"><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('') + (P.rows ? P.rows.map(r => `<div class="jrow">${r.map(([src, w, h]) => `<img src="${src}" width="${w}" height="${h}" style="flex-grow:${(w / h).toFixed(4)}" alt="${esc(P.title)}" loading="lazy">`).join('')}</div>`).join('') : (P.video ? P.images : P.images.slice(1)).map((src,i) => `<img src="${src}" alt="${esc(P.title)}, photo ${i+1}" loading="lazy">`).join('')) +
       (P.end ? `<video class="film" src="${P.end[0]}" poster="${P.end[1]}" controls playsinline preload="none"></video>` : '');
     items.querySelectorAll('video').forEach(v => v.pause());
     items.hidden = true; gal.hidden = false; show();
