@@ -65,6 +65,11 @@ footer{padding-block:32px;border-top:1px solid var(--line);font-size:10px;letter
 .list-top .sec-label{margin:0}
 .back{text-decoration:none;opacity:.75}
 .back:hover{opacity:1}
+/* Back stays pinned top-left while scrolling, on a dark pill so it reads over photos */
+#back,#phero-back{position:fixed;z-index:60;top:calc(env(safe-area-inset-top,0px) + 16px);left:clamp(16px,4vw,48px);padding:10px 16px;font-size:13px;letter-spacing:.16em;color:#F2F2F2;opacity:1;background:rgba(0,0,0,.6);border:1px solid rgba(242,242,242,.3);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#back:hover,#phero-back:hover{border-color:#F2F2F2}
+.list-top{min-height:44px;justify-content:flex-end}
+.phero-top{justify-content:flex-end!important}
 .list-title{font:500 clamp(24px,4vw,44px)/1.15 var(--mono);letter-spacing:.1em;margin:clamp(24px,6vw,64px) 0 16px;text-wrap:balance}
 .list-desc{margin:-24px 0 48px;max-width:62ch;font-size:12px;line-height:1.8;letter-spacing:.08em;text-transform:none}
 .list-desc p{margin:0 0 14px}
@@ -141,7 +146,7 @@ html.snap #home footer{scroll-snap-align:end}
 /* the description sits on the first screen under Back when there is room for it */
 /* darker top when the description sits on the photo, so it reads on bright shots */
 .phero.desctop::after{background:linear-gradient(to top,rgba(0,0,0,.72),rgba(0,0,0,0) 45%),linear-gradient(to bottom,rgba(0,0,0,.72),rgba(0,0,0,.45) 40%,rgba(0,0,0,0) 62%)}
-.phero-desc{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 64px);left:clamp(16px,4vw,48px);margin:0;color:#F2F2F2;text-shadow:0 1px 12px rgba(0,0,0,.6)}
+.phero-desc{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 80px);left:clamp(16px,4vw,48px);margin:0;color:#F2F2F2;text-shadow:0 1px 12px rgba(0,0,0,.6)}
 .phero-desc .credits{border-top-color:rgba(242,242,242,.3)}
 .phero-desc .credits dt{color:rgba(242,242,242,.6)}
 .phero-top{position:absolute;z-index:2;top:calc(env(safe-area-inset-top,0px) + 24px);left:clamp(16px,4vw,48px);right:clamp(16px,4vw,48px);display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.2em;color:#F2F2F2}
