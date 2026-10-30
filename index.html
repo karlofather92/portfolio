@@ -707,9 +707,21 @@ function reelCap(rows, mid){
   capRow = best; capHead.classList.add('swap'); clearTimeout(capTimer);
   capTimer = setTimeout(() => { capHead.innerHTML = capRow.querySelector('.head').innerHTML; capHead.classList.remove('swap'); }, 180);
 }
+// on a project page, text fades out as it scrolls up past a line just under the pinned Back button
+const FADE = 16;
+function fadeTexts(){
+  const pb = document.getElementById('phero-back');
+  if(phero.hidden) return;
+  const line = pb.getBoundingClientRect().bottom + 2;
+  document.querySelectorAll('#phero-desc, .phero-info, #listing p, #listing h1, #listing h2, #listing dl, #listing figcaption, #listing .gnum, #listing footer').forEach(el => {
+    const r = el.getBoundingClientRect(), cut = line - r.top;
+    const m = cut <= -FADE || r.bottom < 0 ? '' : `linear-gradient(to bottom, transparent ${cut}px, #000 ${cut + FADE}px)`;
+    if(el.style.maskImage !== m){ el.style.maskImage = m; el.style.webkitMaskImage = m; }
+  });
+}
 let reelQueued = false, settleTimer = 0;
 window.addEventListener('scroll', () => {
-  if(!reelQueued){ reelQueued = true; requestAnimationFrame(() => { reelQueued = false; reel(); }); }
+  if(!reelQueued){ reelQueued = true; requestAnimationFrame(() => { reelQueued = false; reel(); fadeTexts(); }); }
   clearTimeout(settleTimer); settleTimer = setTimeout(learnSnap, 160);
 }, {passive: true});
 window.addEventListener('resize', () => { snapMid = null; reel(); });
@@ -849,7 +861,7 @@ function route(){
     const t = document.getElementById(key); if(t) t.scrollIntoView();
   }
 }
-window.addEventListener('hashchange', route);
+window.addEventListener('hashchange', () => { route(); requestAnimationFrame(fadeTexts); });
 renderWorks();
 route();
 if(!home.hidden) document.documentElement.classList.add('snap');
