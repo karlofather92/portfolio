@@ -65,9 +65,9 @@ footer{padding-block:32px;border-top:1px solid var(--line);font-size:10px;letter
 .list-top .sec-label{margin:0}
 .back{text-decoration:none;opacity:.75}
 .back:hover{opacity:1}
-/* Back stays pinned top-left while scrolling, on a dark pill so it reads over photos */
-#back,#phero-back{position:fixed;z-index:60;top:calc(env(safe-area-inset-top,0px) + 16px);left:clamp(16px,4vw,48px);padding:10px 16px;font-size:13px;letter-spacing:.16em;color:#F2F2F2;opacity:1;background:rgba(0,0,0,.6);border:1px solid rgba(242,242,242,.3);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-#back:hover,#phero-back:hover{border-color:#F2F2F2}
+/* Back stays pinned top-left while scrolling; a soft shadow keeps it readable over photos */
+#back,#phero-back{position:fixed;z-index:60;top:calc(env(safe-area-inset-top,0px) + 16px);left:clamp(16px,4vw,48px);padding:10px 0;font-size:13px;letter-spacing:.16em;color:#F2F2F2;opacity:1;text-shadow:0 1px 10px rgba(0,0,0,.7)}
+#back:hover,#phero-back:hover{opacity:.7}
 .list-top{min-height:44px;justify-content:flex-end}
 .phero-top{justify-content:flex-end!important}
 .list-title{font:500 clamp(24px,4vw,44px)/1.15 var(--mono);letter-spacing:.1em;margin:clamp(24px,6vw,64px) 0 16px;text-wrap:balance}
