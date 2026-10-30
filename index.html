@@ -158,6 +158,7 @@ html.snap #home footer{scroll-snap-align:end}
 .phero-info{position:absolute;z-index:2;left:clamp(16px,4vw,48px);right:clamp(16px,4vw,48px);bottom:clamp(28px,6vh,64px);color:#F2F2F2;display:grid;gap:14px}
 .phero-info .sec-label{margin:0;color:rgba(242,242,242,.75)}
 .phero-info h1{margin:0;font:500 clamp(40px,9vw,120px)/1 var(--mono);letter-spacing:.06em}
+.phero-info h1.faint{opacity:.5}
 .phero-info dl{display:flex;flex-wrap:wrap;gap:8px 40px;margin:0;font-size:11px}
 .phero-info dt{color:rgba(242,242,242,.6);font-size:9px;letter-spacing:.2em;margin-bottom:4px}
 .phero-info dd{margin:0}
@@ -578,7 +579,7 @@ const PROJECTS = {
     sections: [{title: 'Pre-production', rows: []}],
     rows: [[['ants-9.webp',1500,1125]], [['ants-4.webp',1237,1600], ['ants-10.webp',1600,1200], ['ants-8.webp',1200,1600]], [['ants-5.webp',1600,1200], ['ants-6.webp',1600,1200]], [['ants-13.webp',1600,1200]], [['ants-11.webp',1600,1200], ['ants-12.webp',1600,1200], ['ants-7.webp',1600,1200]]],
     desc: ['Ten black and red ants for the Mutabor club in Moscow.', 'A project about transforming a familiar image by changing its scale. The ants become a monumental colony that invades the club and changes how the space is perceived.'],
-    descTop: true,
+    descTop: true, faintTitle: true,
     credits: [['Author', 'Yuriy Avdeev']]},
   chair: {title:'Bread Chair', year:'2026', sub:'Bread', parent:'objects', pos: '50% 0%', images: JSON.parse(document.getElementById('chair-data').textContent),
     desc: ['A chair made from bread.']},
@@ -753,7 +754,7 @@ function openHero(P){
   if(!on){ closeHero(); return; }
   document.getElementById('phero-back').setAttribute('href', '#works');
   document.getElementById('phero-cat').textContent = LISTS[P.parent].title;
-  document.getElementById('phero-title').textContent = P.title;
+  const ptitle = document.getElementById('phero-title'); ptitle.textContent = P.title; ptitle.classList.toggle('faint', !!P.faintTitle);
   document.getElementById('phero-meta').innerHTML = [['Year', P.year], ['Material', P.sub], ['Category', LISTS[P.parent].title]]
     .map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('');
   const pimg = document.getElementById('phero-img'), pemb = document.getElementById('phero-embed');
