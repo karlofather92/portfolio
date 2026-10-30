@@ -172,6 +172,13 @@ html.snap #home footer{scroll-snap-align:end}
 .gallery .gsec{column-span:all;border-top:1px solid var(--line);padding-top:24px;margin:clamp(40px,6vw,64px) 0 24px}
 .gallery .gsec .sec-label{margin:0;font-weight:inherit}
 .gallery .gtext{margin:16px 0 0;max-width:62ch;font-size:12px;line-height:1.8;letter-spacing:.08em;text-transform:none}
+.gallery .gstep{column-span:all;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:clamp(24px,4vw,64px);align-items:center;margin:0 0 clamp(40px,6vw,80px)}
+.gallery .gstep:nth-of-type(even){grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.gallery .gstep:nth-of-type(even) .gstep-text{order:2}
+.gallery .gstep-img .jrow:last-child{margin-bottom:0}
+.gallery .gstep-text .gtext:first-of-type{margin-top:12px}
+.gallery .gnum{font-size:10px;letter-spacing:.2em;color:var(--muted)}
+@media(max-width:600px){.gallery .gstep,.gallery .gstep:nth-of-type(even){grid-template-columns:1fr}.gallery .gstep:nth-of-type(even) .gstep-text{order:0}}
 .gallery .gsoon{margin:16px 0 0;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 @media(max-width:600px){.gallery .jrow{flex-direction:column}.gallery .jrow img{flex:none!important;width:100%}}
 .gallery .fig figcaption{font-size:12px;line-height:1.8;letter-spacing:.08em;text-transform:none;max-width:40ch}
@@ -576,7 +583,11 @@ const PROJECTS = {
   ants: {title:'Colony', year:'2021', sub:'Polyurethane foam, metal, casting', parent:'art', images: JSON.parse(document.getElementById('ants-data').textContent),
     // gallery laid out in rows; photos in a row share one height
     // titled parts after the gallery, each under a divider line
-    sections: [{title: 'Pre-production', text: ['The production of the ten ants began with creating a master model. Each insect was sculpted by hand from expanded polystyrene (EPS), with the head, abdomen, thorax and legs shaped as separate elements and assembled into a complete form.', 'A silicone mould was made from the finished master model to reproduce the original shape and details.', 'Polyurethane foam was then cast into the mould to produce ten identical ants. After demoulding, each sculpture was cleaned, finished and prepared for painting.'], rows: [[['ants-pre-1.webp',1280,960], ['ants-pre-3.webp',960,1280], ['ants-pre-4.webp',960,1280]], [['ants-pre-2.webp',1280,960]]]}],
+    sections: [{title: 'Pre-production',
+      // each step is a text beside its photos, sides alternating
+      steps: [{text: ['The production of the ten ants began with creating a master model. Each insect was sculpted by hand from expanded polystyrene (EPS), with the head, abdomen, thorax and legs shaped as separate elements and assembled into a complete form.'], rows: [[['ants-pre-1.webp',1280,960]]]},
+              {text: ['A silicone mould was made from the finished master model to reproduce the original shape and details.', 'Polyurethane foam was then cast into the mould to produce ten identical ants. After demoulding, each sculpture was cleaned, finished and prepared for painting.'], rows: [[['ants-pre-3.webp',960,1280], ['ants-pre-4.webp',960,1280]]]}],
+      rows: [[['ants-pre-2.webp',1280,960]]]}],
     rows: [[['ants-5.webp',1600,1200]], [['ants-4.webp',1237,1600], ['ants-10.webp',1600,1200], ['ants-8.webp',1200,1600]], [['ants-9.webp',1500,1125], ['ants-6.webp',1600,1200]], [['ants-11.webp',1600,1200]], [['ants-13.webp',1600,1200], ['ants-12.webp',1600,1200], ['ants-7.webp',1600,1200]]],
     desc: ['Ten black and red ants for the Mutabor club in Moscow.', 'A project about transforming a familiar image by changing its scale. The ants become a monumental colony that invades the club and changes how the space is perceived.'],
     descTop: true,
@@ -819,7 +830,10 @@ function route(){
     gal.innerHTML = (P.full ? `<video class="film" src="${P.full[0]}" poster="${P.full[1]}" controls playsinline preload="none"></video>` : '') + (P.vimeo ? `<iframe class="vplayer" src="https://player.vimeo.com/video/${P.vimeo}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="${esc(P.title)}"></iframe>` : '') + (P.films || []).map(([src, poster]) => `<video class="film" src="${src}" poster="${poster}" muted autoplay loop playsinline></video>`).join('') +
       (P.grid ? `<div class="vgrid">${P.grid.map(f => f ? `<div class="vtile"><video src="${f[0]}" poster="${f[1]}" muted autoplay loop playsinline></video>${VSLIDER}</div>` : '<div class="vtile empty">Video coming soon</div>').join('')}</div>` : '') +
       (P.figs || []).map(([src, cap]) => `<figure class="fig"><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${esc(cap)}</figcaption></figure>`).join('') + (P.rows ? P.rows.map(r => `<div class="jrow">${r.map(([src, w, h]) => `<img src="${src}" width="${w}" height="${h}" style="flex-grow:${(w / h).toFixed(4)}" alt="${esc(P.title)}" loading="lazy">`).join('')}</div>`).join('') : (P.video ? P.images : P.images.slice(1)).map((src,i) => `<img src="${src}" alt="${esc(P.title)}, photo ${i+1}" loading="lazy">`).join('')) +
-      (P.sections || []).map(S => `<div class="gsec"><h2 class="sec-label">${esc(S.title)}</h2>${(S.text || []).map(t => `<p class="gtext">${esc(t)}</p>`).join('')}${S.rows.length ? '' : '<p class="gsoon">Photos coming soon</p>'}</div>` + S.rows.map(r => `<div class="jrow">${r.map(([src, w, h]) => `<img src="${src}" width="${w}" height="${h}" style="flex-grow:${(w / h).toFixed(4)}" alt="${esc(P.title)}, ${esc(S.title)}" loading="lazy">`).join('')}</div>`).join('')).join('') +
+      (P.sections || []).map(S => { const jrow = r => `<div class="jrow">${r.map(([src, w, h]) => `<img src="${src}" width="${w}" height="${h}" style="flex-grow:${(w / h).toFixed(4)}" alt="${esc(P.title)}, ${esc(S.title)}" loading="lazy">`).join('')}</div>`;
+        return `<div class="gsec"><h2 class="sec-label">${esc(S.title)}</h2>${(S.text || []).map(t => `<p class="gtext">${esc(t)}</p>`).join('')}${S.rows.length || S.steps ? '' : '<p class="gsoon">Photos coming soon</p>'}</div>` +
+        (S.steps || []).map((st, i) => `<div class="gstep"><div class="gstep-text"><span class="gnum">${String(i + 1).padStart(2, '0')}</span>${st.text.map(t => `<p class="gtext">${esc(t)}</p>`).join('')}</div><div class="gstep-img">${st.rows.map(jrow).join('')}</div></div>`).join('') +
+        S.rows.map(jrow).join(''); }).join('') +
       (P.end ? `<video class="film" src="${P.end[0]}" poster="${P.end[1]}" controls playsinline preload="none"></video>` : '');
     items.querySelectorAll('video').forEach(v => v.pause());
     items.hidden = true; gal.hidden = false; show();
